@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+	
+	<import resource="biz-interfacetask-context.xml"/>
+	 
+	<bean id="lbpfProcessorDispatcher"
+		class="com.easys.service.lbpf.util.LbpfProcessorDispatcher">
+		<property name="dispatcher">
+			<map>
+				<entry key="GeneratePDF" value="com.easys.service.appinterface.GeneratePDFProcessor" />
+				<entry key="Fax" value="com.easys.service.appinterface.FaxInvProcessor" />
+				<entry key="Email" value="com.easys.service.appinterface.EmailInvProcessor" />
+				<entry key="Print" value="com.easys.service.appinterface.PrintInvProcessor" />
+				<entry key="InvDataToCS" value="com.easys.service.cargosmartinterface.impl.CSInvoiceDataProcessor" />
+				<entry key="InvAuditInfoToCS" value="com.easys.service.cargosmartinterface.impl.CSInvoiceAuditInfoProcessor" />
+				<entry key="InvPDFToCS" value="com.easys.service.cargosmartinterface.impl.CSInvoicePDFProcessor" />
+				<entry key="SOAToCs" value="com.easys.service.cargosmartinterface.impl.CSSOAPdfProcessor" />
+				<entry key="CancelSOAToCs" value="com.easys.service.cargosmartinterface.impl.CSSOAPdfProcessor" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="lbpfExecutor" class="com.easys.frm.concurrent.PriorityThreadPoolFactoryBean">
+		<property name="threadName" value="LbpfExecutor" />
+		<property name="size" value="20" />
+	</bean>
+	
+	<bean id="LbpfService" class="com.easys.lbpf.processor.DefaultLbpfService">
+		<property name="taskService" ref="interfaceTaskService" />
+		<property name="lbpfExecutor" ref="lbpfExecutor" />
+	</bean>
+	
+	<bean id="InputStreamEventListener" class="com.easys.lbpf.processor.listener.InputStreamEventListener"/>
+	
+	<bean id="ExceptionStreamEventListener" class="com.easys.lbpf.processor.listener.ExceptionStreamEventListener"/>
+	
+	<bean id="OutputStreamEventListener" class="com.easys.lbpf.processor.listener.OutputStreamEventListener"/>
+	
+</beans>
